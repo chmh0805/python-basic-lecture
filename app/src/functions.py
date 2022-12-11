@@ -5,7 +5,11 @@
 # say_hello('hyuk', 28)
 # say_hello('sun', 28)
 
-def tax_calculator(salary, tax_rate=0.35):
-    print("tax :", salary * tax_rate)
+def tax_calc(salary, tax_rate=0.35):
+    return salary * tax_rate
 
-tax_calculator(150000000)
+def pay_tax(tax):
+    print('thank you for paying', tax)
+
+to_pay = tax_calc(150000000)
+pay_tax(to_pay)
