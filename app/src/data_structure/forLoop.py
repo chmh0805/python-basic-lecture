@@ -2,10 +2,10 @@ from requests import get
 
 websites = (
     "google.com",
-    "airbnb.com",
-    "https://twitter.com",
-    "facebook.com",
-    "https://tiktok.com"
+    "httpstat.us/200",
+    "httpstat.us/300",
+    "https://httpstat.us/400",
+    "httpstat.us/500"
 )
 
 results = {}
@@ -21,11 +21,15 @@ for website in websites:
         response.status_code,
         # response.content
     )
-    if response.status_code == 200:
+    if response.status_code < 300:
         results[website] = "OK"
         # print(f"{website} is OK. [{response.status_code}]")
+    elif response.status_code < 400:
+        results[website] = "REDIRECT"
+    elif response.status_code < 500:
+        results[website] = "FAILED(CLIENT ERROR)"
     else:
-        results[website] = "FAILED"
+        results[website] = "FAILED(SERVER ERROR)"
         # print(f"{website} is not OK. [{response.status_code}]")
     # print("hello, Welcome to", website)
 
