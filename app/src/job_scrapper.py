@@ -11,7 +11,7 @@ def set_chrome_driver():
     )
     return driver
 
-def openUrl(driver, url):
+def open_url(driver, url):
     driver.get(url)
 
 def prompt_search_word():
@@ -28,40 +28,51 @@ def prompt_limit():
     print(f"limit : {limit}")
     return limit
 
-def parse_results(results):
+def get_page_count(driver, base_url):
+    open_url(driver, base_url)
     soup = BeautifulSoup(driver.page_source, "html.parser")
-    jobs = soup.find_all('div', class_='job_seen_beacon')
-    for job_post in jobs:
-        post_header = job_post.find("h2", class_='jobTitle')
-        post_title = post_header.find("span")['title']
-        anchor_href = f"https://kr.indeed.com{post_header.find('a')['href']}"
-        company_name = job_post.find("span", class_="companyName").string
-        company_location = job_post.find("div", class_="companyLocation").string
-        job_div = job_post.find("div", class_="attribute_snippet")
-        job_type = f"({job_div.get_text()})" if job_div is not None else ""
+    pages = soup.select("nav[role=navigation] a")
+    count = len(pages)
+    if count == 0:
+        return 1
+    elif count >= 5:
+        return 5
+    else:
+        return count
 
-        job_data = {
-            "title": post_title,
-            "company": company_name,
-            "location": company_location,
-            "job_type": job_type,
-            "link": anchor_href
-        }
-        results.append(job_data)
-        # print(f"[{post_title}] {job_type}\n{company_name} - {company_location}\nlink: {anchor_href}")
-        # print()
+def parse_results(driver, base_url, limit, results):
+    page_count = get_page_count(driver, base_url)
+    for page_idx in range(page_count):
+        url = f"{base_url}&start={page_idx * limit}"
+        open_url(driver, url)
+        soup = BeautifulSoup(driver.page_source, "html.parser")
+        jobs = soup.find_all('div', class_='job_seen_beacon')
+        for job_post in jobs:
+            post_title = job_post.select_one("h2.jobTitle span")['title']
+            anchor_href = f"https://kr.indeed.com{job_post.select_one('h2.jobTitle a')['href']}"
+            company_name = job_post.find("span", class_="companyName").string
+            company_location = job_post.find("div", class_="companyLocation").string
+            job_div = job_post.find("div", class_="attribute_snippet")
+            job_type = f"({job_div.get_text()})" if job_div is not None else ""
+
+            job_data = {
+                "title": post_title,
+                "company": company_name,
+                "location": company_location,
+                "job_type": job_type,
+                "link": anchor_href
+            }
+            results.append(job_data)
 
 if __name__ == "__main__":
     search_word = prompt_search_word()
     limit = prompt_limit()
-    url = f"https://kr.indeed.com/jobs?limit={limit}&q={search_word}"
-    print(f"Find URL : {url}")
+    base_url = f"https://kr.indeed.com/jobs?limit={limit}&q={search_word}"
+    print(f"Find URL : {base_url}")
     print("Please Wait for scrapping...")
     driver = set_chrome_driver()
-    openUrl(driver, url)
-
     results = []
-    parse_results(results=results)
+    parse_results(driver=driver, base_url=base_url, limit=limit, results=results)
 
     for result in results:
         print(result, end='\n')
