@@ -38,14 +38,14 @@ def parse_results(driver, base_url, limit, results):
             anchor_href = f"https://kr.indeed.com{job_post.select_one('h2.jobTitle a')['href']}"
             company_name = job_post.find("span", class_="companyName").string
             company_location = job_post.find("div", class_="companyLocation").string
-            job_div = job_post.find("div", class_="attribute_snippet")
-            job_type = f"({job_div.get_text()})" if job_div is not None else ""
+            # job_div = job_post.find("div", class_="attribute_snippet")
+            # job_type = f"({job_div.get_text()})" if job_div is not None else ""
 
             job_data = {
-                "title": post_title,
+                "position": post_title,
                 "company": company_name,
                 "location": company_location,
-                "job_type": job_type,
+                # "job_type": job_type,
                 "link": anchor_href
             }
             results.append(job_data)

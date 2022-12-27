@@ -1,5 +1,7 @@
 from indeed.indeed_main import do_indeed_scrapper
 from wwr.wwr_main import do_weworkremotely_scrapper
+from os import path, mkdir
+from datetime import datetime
 
 def prompt_search_word():
     search_word = input("Enter what you want to get. (Ex) python\n")
@@ -14,14 +16,33 @@ def prompt_limit():
         raise ValueError(f"entered limit value{limit} is not between 1 and 50.")
     print(f"limit : {limit}")
     return limit
+
+def write_result_to_file(dirpath, filename, job_results):
+    if path.isdir(dirpath) is False:
+        mkdir(dirpath)
+    file = open(path.join(dirpath, filename), "w", encoding="utf-8")
+    file.write("Position,Company,Location,URL\n")
+
+    for job_result in job_results:
+        position = job_result['position'].replace(",", " ")
+        company = job_result['company'].replace(",", " ")
+        location = job_result['location'].replace(",", " ")
+        link = job_result['link']
+        file.write(f"{position},{company},{location},{link}\n")
+    file.close()
     
 if __name__ == "__main__":
     keyword = prompt_search_word()
     limit = prompt_limit()
-    result = []
 
     indeed_res = do_indeed_scrapper(keyword, limit)
     wwr_res = do_weworkremotely_scrapper(keyword)
-    result = indeed_res + wwr_res
+    job_results = indeed_res + wwr_res
 
-    print(result)
+    now = datetime.now()
+    dateformat_str = now.strftime("%Y_%m_%d_%H_%M_%S")
+    filename = f"{dateformat_str}-{keyword}.csv"
+
+    ROOT_DIR = path.dirname(path.abspath(__file__))
+    RESULT_DIR_PATH = path.join(ROOT_DIR, "../../results")
+    write_result_to_file(RESULT_DIR_PATH, filename, job_results)
