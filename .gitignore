@@ -4,3 +4,4 @@ venv**
 /app/config
 /app/webdriver
 results**
+__pycache__**

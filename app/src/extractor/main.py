@@ -1,7 +1,9 @@
 from indeed.indeed_main import do_indeed_scrapper
 from wwr.wwr_main import do_weworkremotely_scrapper
-from os import path, mkdir
+from file import write_result_to_file
+from os import path
 from datetime import datetime
+
 
 def prompt_search_word():
     search_word = input("Enter what you want to get. (Ex) python\n")
@@ -10,6 +12,7 @@ def prompt_search_word():
     print(f"search_word : {search_word}")
     return search_word
 
+
 def prompt_limit():
     limit = int(input("Enter the limit of search result, It will work only to indeed. (Min: 1, Max: 50)"))
     if limit < 1 or limit > 50:
@@ -17,20 +20,7 @@ def prompt_limit():
     print(f"limit : {limit}")
     return limit
 
-def write_result_to_file(dirpath, filename, job_results):
-    if path.isdir(dirpath) is False:
-        mkdir(dirpath)
-    file = open(path.join(dirpath, filename), "w", encoding="utf-8")
-    file.write("Position,Company,Location,URL\n")
 
-    for job_result in job_results:
-        position = job_result['position'].replace(",", " ")
-        company = job_result['company'].replace(",", " ")
-        location = job_result['location'].replace(",", " ")
-        link = job_result['link']
-        file.write(f"{position},{company},{location},{link}\n")
-    file.close()
-    
 if __name__ == "__main__":
     keyword = prompt_search_word()
     limit = prompt_limit()
