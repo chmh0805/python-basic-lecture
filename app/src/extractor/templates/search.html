@@ -5,10 +5,34 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
     <title>Search Results</title>
 </head>
 <body>
-    <h3>Find Keyword: {{keyword}}</h3>
-    <h1>Search Results: </h1>
+    <main class="container">
+        <h1>Search Results for "{{keyword}}"</h1>
+        <figure>
+            <table role="grid">
+                <thead>
+                    <tr>
+                        <th>Position</th>
+                        <th>Company</th>
+                        <th>Location</th>
+                        <th>Link</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for job_result in job_results %}
+                        <tr>
+                            <td>{{job_result.position}}</td>
+                            <td>{{job_result.company}}</td>
+                            <td>{{job_result.location}}</td>
+                            <td><a href="{{job_result.link}}" target="_blank">Apply now &rarr;</a></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </figure>
+    </main>
 </body>
 </html>
