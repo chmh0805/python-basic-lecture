@@ -8,9 +8,9 @@ def home():
     return render_template("home.html", name="Hyuk")
 
 
-@app.route("/hello")
+@app.route("/search")
 def hello():
-    return "Hello There!"
+    return render_template("search.html", keyword="aaaa")
 
 
 app.run(debug=True)
